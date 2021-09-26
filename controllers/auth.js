@@ -38,6 +38,7 @@ const crearUsuario =async(req,res=response)=>{
                 ok:true,
                 uid:dbUser.id,
                 name,
+                email,
                 token
             });
         }else{
@@ -76,9 +77,10 @@ const loginUsuario=async(req,res)=>{
                 //respuesta del servicio
                 return res.json({
                     ok:true,
-                uid:dbUser.id,
-                name:dbUser.name,
-                token
+                    uid:dbUser.id,
+                    name:dbUser.name,
+                    email:dbUser.email,
+                    token
                 });
 
             }else{
@@ -104,16 +106,20 @@ const loginUsuario=async(req,res)=>{
     }   
 }
 
-const revalidarToken = async(req,res)=>{
+const revalidarToken = async(req,res=response)=>{
 
-    const {uid,name}= req;
-    const token = await generarJWT(uid,name);
+    const {uid}= req;
+
+    //leer bbdd para obtener email
+    const dbUser = await Usuario.findById(uid);
+    const token = await generarJWT(uid,dbUser.name);
 
 
     return res.json({
         ok:true,
         uid,
-        name,
+        name:dbUser.name,
+        email:dbUser.email,
         token
     });
 
